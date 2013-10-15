@@ -1,0 +1,12 @@
+vs110\cryptpp.sdf
+vs110\adhoc.*
+vs110\Win32\*
+vs110\ipch\*
+
+vs110\Win32\cryptopp\Debug*
+vs110\Win32\cryptopp\Release*
+
+vs110\Win32\dlltest\Debug*
+vs110\Win32\dlltest\Release*
+
+*.obj
