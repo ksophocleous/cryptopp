@@ -6,7 +6,7 @@ project(cryptopp)
 set(WARNING_LEVEL 3)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/unify.cmake)
 
-add_library(cryptolib STATIC
+add_library(cryptopp STATIC
 	3way.cpp
 	adhoc.cpp.proto
 	adler32.cpp
