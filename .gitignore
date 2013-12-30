@@ -1,3 +1,4 @@
+build/
 vs110\cryptpp.sdf
 vs110\adhoc.*
 vs110\Win32\*
