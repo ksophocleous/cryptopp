@@ -50,7 +50,6 @@ set(src
 	cpu.cpp
 	crc.cpp
 	cryptlib.cpp
-	cryptlib_bds.cpp
 	default.cpp
 	des.cpp
 	dessp.cpp
