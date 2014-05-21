@@ -2,11 +2,30 @@ cmake_minimum_required(VERSION 2.6)
 
 project(cryptopp)
 
-# override warning level (default is 4)
-set(WARNING_LEVEL 3)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/unify.cmake)
+# use stark
+include("stark.cmake" OPTIONAL RESULT_VARIABLE STARK_FOUND)
 
-add_library(cryptopp STATIC
+option(INCLUDE_MAIN "Build in test mode (produces an executable)" OFF)
+option(INCLUDE_NETWORK "Include networking component" OFF)
+option(BUILD_SHARED "Build shared version of the library" OFF)
+
+set(libtype STATIC)
+
+set(extras
+#	bench.cpp
+#	bench2.cpp
+#	datatest.cpp
+#	test.cpp
+#	validat1.cpp
+#	validat2.cpp
+#	validat3.cpp
+#	dlltest.cpp
+#	bench.h
+#	validate.h
+#	regtest.cpp
+)
+
+set(src
 	3way.cpp
 	adhoc.cpp.proto
 	adler32.cpp
@@ -18,8 +37,6 @@ add_library(cryptopp STATIC
 	base32.cpp
 	base64.cpp
 	basecode.cpp
-	bench.cpp
-	bench2.cpp
 	bfinit.cpp
 	blowfish.cpp
 	blumshub.cpp
@@ -34,14 +51,12 @@ add_library(cryptopp STATIC
 	crc.cpp
 	cryptlib.cpp
 	cryptlib_bds.cpp
-	datatest.cpp
 	default.cpp
 	des.cpp
 	dessp.cpp
 	dh.cpp
 	dh2.cpp
 	dll.cpp
-	dlltest.cpp
 	dsa.cpp
 	eax.cpp
 	ec2n.cpp
@@ -81,7 +96,6 @@ add_library(cryptopp STATIC
 	mqueue.cpp
 	mqv.cpp
 	nbtheory.cpp
-	network.cpp
 	oaep.cpp
 	osrng.cpp
 	panama.cpp
@@ -97,7 +111,6 @@ add_library(cryptopp STATIC
 	rc5.cpp
 	rc6.cpp
 	rdtables.cpp
-	regtest.cpp
 	rijndael.cpp
 	ripemd.cpp
 	rng.cpp
@@ -114,23 +127,18 @@ add_library(cryptopp STATIC
 	sharkbox.cpp
 	simple.cpp
 	skipjack.cpp
-	socketft.cpp
 	sosemanuk.cpp
 	square.cpp
 	squaretb.cpp
 	stdcpp.h
 	strciphr.cpp
 	tea.cpp
-	test.cpp
 	tftables.cpp
 	tiger.cpp
 	tigertab.cpp
 	trdlocal.cpp
 	ttmac.cpp
 	twofish.cpp
-	validat1.cpp
-	validat2.cpp
-	validat3.cpp
 	vmac.cpp
 	wait.cpp
 	wake.cpp
@@ -140,4 +148,186 @@ add_library(cryptopp STATIC
 	xtrcrypt.cpp
 	zdeflate.cpp
 	zinflate.cpp
-	zlib.cpp)
+	zlib.cpp
+	sha3.cpp)
+
+set(public_hdr
+	sha3.h
+	3way.h
+	adler32.h
+	aes.h
+	algebra.h
+	algparam.h
+	arc4.h
+	argnames.h
+	asn.h
+	authenc.h
+	base32.h
+	base64.h
+	basecode.h
+	blowfish.h
+	blumshub.h
+	camellia.h
+	cast.h
+	cbcmac.h
+	ccm.h
+	channels.h
+	cmac.h
+	config.h
+	cpu.h
+	crc.h
+	cryptlib.h
+	default.h
+	des.h
+	dh.h
+	dh2.h
+	dll.h
+	dmac.h
+	dsa.h
+	eax.h
+	ec2n.h
+	eccrypto.h
+	ecp.h
+	elgamal.h
+	emsa2.h
+	eprecomp.h
+	esign.h
+	factory.h
+	files.h
+	filters.h
+	fips140.h
+	fltrimpl.h
+	gcm.h
+	gf256.h
+	gf2_32.h
+	gf2n.h
+	gfpcrypt.h
+	gost.h
+	gzip.h
+	hex.h
+	hmac.h
+	hrtimer.h
+	ida.h
+	idea.h
+	integer.h
+	iterhash.h
+	lubyrack.h
+	luc.h
+	mars.h
+	md2.h
+	md4.h
+	md5.h
+	mdc.h
+	misc.h
+	modarith.h
+	modes.h
+	modexppc.h
+	mqueue.h
+	mqv.h
+	nbtheory.h
+	nr.h
+	oaep.h
+	oids.h
+	osrng.h
+	panama.h
+	pch.h
+	pkcspad.h
+	polynomi.h
+	pssr.h
+	pubkey.h
+	pwdbased.h
+	queue.h
+	rabin.h
+	randpool.h
+	rc2.h
+	rc5.h
+	rc6.h
+	resource.h
+	rijndael.h
+	ripemd.h
+	rng.h
+	rsa.h
+	rw.h
+	safer.h
+	salsa.h
+	seal.h
+	secblock.h
+	seckey.h
+	seed.h
+	serpent.h
+	serpentp.h
+	sha.h
+	shacal2.h
+	shark.h
+	simple.h
+	skipjack.h
+	smartptr.h
+	sosemanuk.h
+	square.h
+	stdcpp.h
+	strciphr.h
+	tea.h
+	tiger.h
+	trdlocal.h
+	trunhash.h
+	ttmac.h
+	twofish.h
+	vmac.h
+	wait.h
+	wake.h
+	whrlpool.h
+	winpipes.h
+	words.h
+	xtr.h
+	xtrcrypt.h
+	zdeflate.h
+	zinflate.h
+	zlib.h)
+
+if(INCLUDE_NETWORK)
+	list(APPEND src "socketft.cpp" "network.cpp")
+	list(APPEND public_hdr "socketft.h" "network.h")
+endif()
+
+#set(INCLUDE_MAIN ON)
+
+if(INCLUDE_MAIN)
+	list(APPEND src "main.cpp")
+endif()
+
+set(public_hdr_loc "include/cryptopp")
+set(libname "cryptopp")
+
+# -- Shared library?
+if (BUILD_SHARED)
+	set(libtype SHARED)
+	set(cryptopp_def "CRYPTOPP_EXPORTS")
+endif()
+
+if(INCLUDE_MAIN)
+	add_executable(${libname} ${src} ${public_hdr})
+else()
+	add_library(${libname} ${libtype} ${src} ${public_hdr})
+endif()
+
+if(WIN32)
+	list(APPEND platformlibs "wsock32.lib")
+	list(APPEND platformlibs "shlwapi.lib")
+endif()
+
+target_link_libraries(${libname} ${platformlibs})
+
+set_target_properties(${libname} PROPERTIES 
+	INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/."
+	PUBLIC_HEADER "${public_hdr}"
+	COMPILE_DEFINITIONS "${cryptopp_def}"
+	VERSION 5.6.2
+	STARK_PUBLIC_HEADER_CHECK_FILE "cryptopp/3way.h"
+	STARK_PUBLIC_HEADER_LOC "include"
+	LIBFILENAME "cryptopp"
+	STARK_PUBLIC_HEADER_DESTINATION "include/cryptopp")
+
+if (STARK_FOUND)
+	stark_install(${libname} "include/cryptopp" ${libname})
+	stark_unify(${libname})
+endif()

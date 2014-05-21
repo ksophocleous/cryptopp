@@ -18,7 +18,7 @@ public:
 
 //! _
 template <class T, class BASE>
-class CRYPTOPP_NO_VTABLE IteratedHashBase : public BASE
+class CRYPTOPP_DLL CRYPTOPP_NO_VTABLE IteratedHashBase : public BASE
 {
 public:
 	typedef T HashWordType;

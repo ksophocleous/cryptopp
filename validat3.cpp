@@ -108,7 +108,6 @@ bool ValidateAdler32()
 	return HashModuleTest(md, testSet, sizeof(testSet)/sizeof(testSet[0]));
 }
 
-
 bool ValidateMD2()
 {
 	HashTestTuple testSet[] = 
@@ -590,4 +589,3 @@ bool ValidatePBKDF()
 
 	return pass;
 }
-
