@@ -2,10 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 
 project(cryptopp)
 
-# use stark
-include("stark.cmake" OPTIONAL RESULT_VARIABLE STARK_FOUND)
-
-option(INCLUDE_MAIN "Build in test mode (produces an executable)" OFF)
 option(INCLUDE_NETWORK "Include networking component" OFF)
 option(BUILD_SHARED "Build shared version of the library" OFF)
 
@@ -288,14 +284,9 @@ if(INCLUDE_NETWORK)
 	list(APPEND public_hdr "socketft.h" "network.h")
 endif()
 
-#set(INCLUDE_MAIN ON)
-
-if(INCLUDE_MAIN)
-	list(APPEND src "main.cpp")
-endif()
-
-set(public_hdr_loc "include/cryptopp")
+set(public_hdr_loc "${CMAKE_CURRENT_SOURCE_DIR}/")
 set(libname "cryptopp")
+set(version "5.6.2")
 
 # -- Shared library?
 if (BUILD_SHARED)
@@ -303,11 +294,7 @@ if (BUILD_SHARED)
 	set(cryptopp_def "CRYPTOPP_EXPORTS")
 endif()
 
-if(INCLUDE_MAIN)
-	add_executable(${libname} ${src} ${public_hdr})
-else()
-	add_library(${libname} ${libtype} ${src} ${public_hdr})
-endif()
+add_library(${libname} ${libtype} ${src} ${public_hdr})
 
 if(WIN32)
 	list(APPEND platformlibs "wsock32.lib")
@@ -319,14 +306,8 @@ target_link_libraries(${libname} ${platformlibs})
 set_target_properties(${libname} PROPERTIES 
 	INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/."
 	PUBLIC_HEADER "${public_hdr}"
+	INTERFACE_INCLUDE_DIRECTORIES "${public_hdr_loc}"
 	COMPILE_DEFINITIONS "${cryptopp_def}"
-	VERSION 5.6.2
-	STARK_PUBLIC_HEADER_CHECK_FILE "cryptopp/3way.h"
-	STARK_PUBLIC_HEADER_LOC "include"
+	VERSION ${version}
 	LIBFILENAME "cryptopp"
-	STARK_PUBLIC_HEADER_DESTINATION "include/cryptopp")
-
-if (STARK_FOUND)
-	stark_install(${libname} "include/cryptopp" ${libname})
-	stark_unify(${libname})
-endif()
+	)
